@@ -14,7 +14,7 @@ const fontMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "GoHome",
-  description: "Know exactly when you can leave work.",
+  description: "Katso milloin voit lähteä töistä.",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -40,7 +40,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="fi"
       suppressHydrationWarning
       className={cn("antialiased", fontMono.variable, "font-sans", inter.variable)}
     >
