@@ -8,6 +8,7 @@ export interface Translations {
 
   // Arrival input
   arrivedAt: string
+  arrivedOn: string
 
   // Leave time section
   youCanLeaveAt: string
@@ -23,13 +24,15 @@ export interface Translations {
 
   // Countdown units (used in time formatting)
   hours: string   // "t" in Finnish, "h" in English
-  minutes: string // "min" in both, but defined here for completeness
+  minutes: string // "min" in both
+  seconds: string // "s" in both
 }
 
 const fi: Translations = {
   appDescription: "Katso milloin voit lähteä töistä.",
 
   arrivedAt: "Saapumisaika",
+  arrivedOn: "Saapumispäivä",
 
   youCanLeaveAt: "Voit lähteä klo",
   lunchIncluded: "Sisältää 30 min lounaan",
@@ -42,12 +45,14 @@ const fi: Translations = {
 
   hours: "t",
   minutes: "min",
+  seconds: "s",
 }
 
 const en: Translations = {
   appDescription: "Know exactly when you can leave work.",
 
   arrivedAt: "Arrived at",
+  arrivedOn: "Arrived on",
 
   youCanLeaveAt: "You can leave at",
   lunchIncluded: "Includes 30 min lunch",
@@ -60,6 +65,7 @@ const en: Translations = {
 
   hours: "h",
   minutes: "min",
+  seconds: "s",
 }
 
 export const translations: Record<Locale, Translations> = { fi, en }

@@ -8,32 +8,28 @@ export interface LeaveTimeResult {
 }
 
 /**
- * Given an arrival time string ("HH:MM"), calculate when the user can leave.
+ * Given an arrival time string ("HH:MM") and an explicit arrival date string
+ * ("YYYY-MM-DD"), calculate when the user can leave.
+ *
+ * Accepting the date separately fixes the midnight-crossing bug: if she arrives
+ * at 22:00 on Monday, leaveTime falls on Tuesday — without an explicit date the
+ * old code set the date to today, which is wrong when today IS Tuesday.
  *
  * Rules:
  *  - Work day is always 8 hours.
- *  - 30-minute lunch is added only when the resulting work day is >= 4 hours.
- *    (In practice the day is always >= 4 h, but the rule is enforced.)
- *  - "Work day is >= 4 hours" is determined by checking whether adding 8 h alone
- *    would keep the leave time beyond (arrival + 4 h). Since the work time is fixed
- *    at 8 h, the day is always >= 4 h, so lunch is always included — unless the
- *    arrival itself is configured so that a full 8 h day crosses midnight and the
- *    effective scheduled hours are < 4. For safety we check: scheduled hours >= 4.
+ *  - 30-minute lunch is added only when WORK_HOURS >= SHORT_DAY_THRESHOLD_HOURS.
  */
-export function calculateLeaveTime(arrivalTimeString: string): LeaveTimeResult {
+export function calculateLeaveTime(
+  arrivalTimeString: string,
+  arrivalDateString: string,
+): LeaveTimeResult {
   const [hours, minutes] = arrivalTimeString.split(":").map(Number)
+  const [year, month, day] = arrivalDateString.split("-").map(Number)
 
-  const arrival = new Date()
-  arrival.setHours(hours, minutes, 0, 0)
+  const arrival = new Date(year, month - 1, day, hours, minutes, 0, 0)
 
-  // Lunch is included when the scheduled work day is >= 4 hours.
-  // Since work time is always 8 h, this is always true in normal usage.
-  // The threshold check: if WORK_HOURS >= SHORT_DAY_THRESHOLD_HOURS → include lunch.
   const lunchIncluded = WORK_HOURS >= SHORT_DAY_THRESHOLD_HOURS
-
-  const totalMinutes =
-    WORK_HOURS * 60 + (lunchIncluded ? LUNCH_MINUTES : 0)
-
+  const totalMinutes = WORK_HOURS * 60 + (lunchIncluded ? LUNCH_MINUTES : 0)
   const leaveTime = new Date(arrival.getTime() + totalMinutes * 60 * 1000)
 
   return { leaveTime, lunchIncluded }
@@ -56,39 +52,48 @@ export function currentTimeString(): string {
   return `${hh}:${mm}`
 }
 
-export interface CountdownResult {
-  done: boolean
-  /** Human-readable remaining time, e.g. "3 t 22 min" (Finnish) or "3 h 22 min" (English) */
-  label: string
-  /** Total remaining minutes (negative when done) */
-  remainingMinutes: number
+/** Return today's date as "YYYY-MM-DD" suitable for <input type="date">. */
+export function currentDateString(): string {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
 }
 
-/** Calculate countdown from now to a target Date.
+export interface CountdownResult {
+  done: boolean
+  /** Human-readable remaining time e.g. "3 t 22 min 10 s" */
+  label: string
+  /** Total remaining seconds (negative when done) */
+  remainingSeconds: number
+}
+
+/** Calculate countdown from now to a target Date, with second precision.
  *  @param leaveTime  The target departure time.
- *  @param units      Localised unit strings, e.g. { hours: "t", minutes: "min" }.
+ *  @param units      Localised unit strings.
  */
 export function getCountdown(
   leaveTime: Date,
-  units: { hours: string; minutes: string } = { hours: "h", minutes: "min" }
+  units: { hours: string; minutes: string; seconds: string } = {
+    hours: "h",
+    minutes: "min",
+    seconds: "s",
+  },
 ): CountdownResult {
   const now = new Date()
   const diffMs = leaveTime.getTime() - now.getTime()
-  const remainingMinutes = Math.floor(diffMs / 60_000)
+  const remainingSeconds = Math.floor(diffMs / 1_000)
 
-  if (remainingMinutes <= 0) {
-    return { done: true, label: "", remainingMinutes }
+  if (remainingSeconds <= 0) {
+    return { done: true, label: "", remainingSeconds }
   }
 
-  const h = Math.floor(remainingMinutes / 60)
-  const m = remainingMinutes % 60
+  const h = Math.floor(remainingSeconds / 3600)
+  const m = Math.floor((remainingSeconds % 3600) / 60)
+  const s = remainingSeconds % 60
 
-  const label =
-    h > 0 && m > 0
-      ? `${h} ${units.hours} ${m} ${units.minutes}`
-      : h > 0
-        ? `${h} ${units.hours}`
-        : `${m} ${units.minutes}`
+  const parts: string[] = []
+  if (h > 0) parts.push(`${h} ${units.hours}`)
+  if (m > 0 || h > 0) parts.push(`${m} ${units.minutes}`)
+  parts.push(`${s} ${units.seconds}`)
 
-  return { done: false, label, remainingMinutes }
+  return { done: false, label: parts.join(" "), remainingSeconds }
 }

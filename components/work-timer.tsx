@@ -1,6 +1,7 @@
 "use client"
 
-import { IconHome, IconClock, IconSalad } from "@tabler/icons-react"
+import { useRef, useEffect } from "react"
+import { IconHome, IconClock, IconSalad, IconCalendar } from "@tabler/icons-react"
 
 import { useWorkTimer } from "@/hooks/use-work-timer"
 import { type Translations } from "@/lib/i18n"
@@ -9,19 +10,30 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
+import { Confetti } from "@/components/confetti"
 import { cn } from "@/lib/utils"
 
 export function WorkTimer() {
   const {
     arrivalTime,
+    arrivalDate,
     leaveTimeFormatted,
     lunchIncluded,
     countdown,
     setArrivalTime,
+    setArrivalDate,
     locale,
     setLocale,
     tr,
   } = useWorkTimer()
+
+  // Fire confetti only on the first transition into done state
+  const firedRef = useRef(false)
+  const showConfetti = countdown.done && !firedRef.current
+  useEffect(() => {
+    if (countdown.done) firedRef.current = true
+    if (!countdown.done) firedRef.current = false
+  }, [countdown.done])
 
   return (
     <Card className="w-full max-w-sm">
@@ -61,6 +73,21 @@ export function WorkTimer() {
           />
         </div>
 
+        {/* Arrival date input */}
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="arrival-date" className="flex items-center gap-1.5">
+            <IconCalendar className="size-4 text-muted-foreground" />
+            {tr.arrivedOn}
+          </Label>
+          <Input
+            id="arrival-date"
+            type="date"
+            value={arrivalDate}
+            onChange={(e) => setArrivalDate(e.target.value)}
+            className="text-base tabular-nums"
+          />
+        </div>
+
         <Separator />
 
         {/* Leave time */}
@@ -81,7 +108,10 @@ export function WorkTimer() {
 
         {/* Countdown / done state */}
         {countdown.done ? (
-          <DoneState tr={tr} />
+          <>
+            {showConfetti && <Confetti />}
+            <DoneState tr={tr} />
+          </>
         ) : (
           <CountdownState label={countdown.label} heading={tr.timeRemaining} />
         )}
