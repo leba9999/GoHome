@@ -8,8 +8,8 @@ export function Confetti() {
   useEffect(() => {
     confetti({
       particleCount: 160,
-      spread: 80,
-      origin: { y: 0.6 },
+      spread: 180,
+      origin: { y: 0.8 },
     })
   }, [])
 
