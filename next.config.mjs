@@ -1,15 +1,16 @@
-import withPWA from "next-pwa"
+import withPWA from "@ducanh2912/next-pwa"
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  // next-pwa uses webpack; opt out of Turbopack for builds
-  turbopack: {},
-}
+const nextConfig = {}
 
 export default withPWA({
   dest: "public",
-  register: true,
-  skipWaiting: true,
-  // Disable service worker in development to avoid caching issues
+  cacheOnFrontEndNav: true,
+  aggressiveFrontEndNavCaching: true,
+  reloadOnOnline: true,
+  // Disable service worker in development to avoid stale-cache headaches
   disable: process.env.NODE_ENV === "development",
+  workboxOptions: {
+    disableDevLogs: true,
+  },
 })(nextConfig)

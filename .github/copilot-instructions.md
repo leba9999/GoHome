@@ -1,7 +1,7 @@
 # GoHome – Copilot Instructions
 
 ## What Is This App
-GoHome is a **mobile-first PWA** (Progressive Web App) work-time tracker. A single user enters her arrival time; the app calculates and displays the earliest leave time. Work day = 8 h + 30 min lunch, but lunch is only added when the scheduled day is **≥ 4 hours** (i.e. `leaveTime = arrival + 8h30min` normally, `arrival + 8h` for short days). The target platform is an Android phone installed via Chrome "Add to Home Screen". Uses `next-pwa` for offline/service-worker support.
+GoHome is a **mobile-first PWA** (Progressive Web App) work-time tracker. A single user enters her arrival time; the app calculates and displays the earliest leave time. Work day = 8 h + 30 min lunch, but lunch is only added when the scheduled day is **≥ 4 hours** (i.e. `leaveTime = arrival + 8h30min` normally, `arrival + 8h` for short days). The target platform is an Android phone installed via Chrome "Add to Home Screen". Uses `@ducanh2912/next-pwa` for offline/service-worker support.
 
 ## Stack
 Next.js 16 (App Router, Turbopack), React 19, TypeScript, Tailwind CSS v4, shadcn/ui (`radix-nova` style).

@@ -48,7 +48,7 @@ npm run lint       # ESLint
 npm run format     # Prettier
 ```
 
-> **Note:** `npm run build` uses `--webpack` (not Turbopack) because `next-pwa` requires webpack to generate the service worker.
+> **Note:** `npm run build` uses `--webpack` (not Turbopack) because `@ducanh2912/next-pwa` requires webpack to generate the service worker. Vercel picks this up automatically from `package.json`.
 
 ---
 

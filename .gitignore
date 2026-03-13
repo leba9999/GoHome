@@ -38,4 +38,5 @@ next-env.d.ts
 # next-pwa generated service worker (build artefact)
 /public/sw.js
 /public/workbox-*.js
+/public/swe-worker-*.js
 
