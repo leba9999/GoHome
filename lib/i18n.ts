@@ -38,7 +38,7 @@ const fi: Translations = {
   timeRemaining: "Aikaa jäljellä",
 
   doneHeading: "Voit lähteä kotiin!",
-  doneBody: "Työpäiväsi on ohi. Lähtöaika!",
+  doneBody: "Työpäiväsi on ohi. Kotiin siitä mars!",
 
   hours: "t",
   minutes: "min",
