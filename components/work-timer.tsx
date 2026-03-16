@@ -35,9 +35,18 @@ export function WorkTimer() {
     // wait a tick for native picker to open in some UIs, then center the input
     setTimeout(() => {
       try {
-        el.scrollIntoView({ behavior: "smooth", block: "center" })
+        // center vertically and horizontally where possible (helps when page is zoomed)
+        el.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" })
+        // additionally, if visualViewport exists and is zoomed, nudge scroll to center
+        const vv = (window as any).visualViewport
+        if (vv && vv.scale && vv.scale > 1) {
+          const rect = el.getBoundingClientRect()
+          const centerX = rect.left + rect.width / 2 + (vv.offsetLeft || 0)
+          const targetScrollX = Math.max(0, centerX - window.innerWidth / 2)
+          window.scrollTo({ left: targetScrollX, top: Math.max(0, rect.top + window.scrollY - window.innerHeight / 2), behavior: "smooth" })
+        }
       } catch {
-        // fallback: window scroll
+        // fallback: window scroll to vertical center
         const y = el.getBoundingClientRect().top + window.scrollY - window.innerHeight / 2
         window.scrollTo({ top: Math.max(0, y), behavior: "smooth" })
       }
