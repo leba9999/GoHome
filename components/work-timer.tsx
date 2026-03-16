@@ -36,9 +36,9 @@ export function WorkTimer() {
   }, [countdown.done])
 
   return (
-    <Card className="w-full max-w-sm">
+  <Card className="w-full max-w-sm mx-auto px-4 sm:px-0">
       <CardHeader>
-        <div className="flex items-center justify-between">
+  <div className="flex items-center justify-between min-w-0">
           <div className="flex items-center gap-2">
             <IconHome className="size-5 text-primary" />
             <CardTitle className="text-lg">GoHome</CardTitle>
@@ -57,7 +57,7 @@ export function WorkTimer() {
         <CardDescription>{tr.appDescription}</CardDescription>
       </CardHeader>
 
-      <CardContent className="flex flex-col gap-6">
+  <CardContent className="flex flex-col gap-6 min-w-0">
         {/* Arrival time input */}
         <div className="flex flex-col gap-2">
           <Label htmlFor="arrival-time" className="flex items-center gap-1.5">
@@ -69,7 +69,7 @@ export function WorkTimer() {
             type="time"
             value={arrivalTime}
             onChange={(e) => setArrivalTime(e.target.value)}
-            className="text-base tabular-nums"
+            className="w-full text-base tabular-nums"
           />
         </div>
 
@@ -84,7 +84,7 @@ export function WorkTimer() {
             type="date"
             value={arrivalDate}
             onChange={(e) => setArrivalDate(e.target.value)}
-            className="text-base tabular-nums"
+            className="w-full text-base tabular-nums"
           />
         </div>
 
