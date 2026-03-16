@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useEffect } from "react"
+import { useRef, useEffect, useState } from "react"
 import { IconHome, IconClock, IconSalad, IconCalendar } from "@tabler/icons-react"
 
 import { useWorkTimer } from "@/hooks/use-work-timer"
@@ -8,6 +8,7 @@ import { type Translations } from "@/lib/i18n"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import TimePicker from "@/components/time-picker"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 import { Confetti } from "@/components/confetti"
@@ -29,6 +30,8 @@ export function WorkTimer() {
 
   const timeRef = useRef<HTMLInputElement | null>(null)
   const dateRef = useRef<HTMLInputElement | null>(null)
+  const [isStandalone, setIsStandalone] = useState(false)
+  const [timePickerOpen, setTimePickerOpen] = useState(false)
 
   function scrollIntoViewSafe(el: HTMLElement | null) {
     if (!el) return
@@ -60,6 +63,21 @@ export function WorkTimer() {
     if (countdown.done) firedRef.current = true
     if (!countdown.done) firedRef.current = false
   }, [countdown.done])
+
+  // detect installed PWA / standalone display-mode at runtime
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const check = () => {
+      const isStandalone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || (navigator as any).standalone === true
+      setIsStandalone(Boolean(isStandalone))
+    }
+    check()
+    // also listen for changes (some browsers update display-mode)
+    const mql = window.matchMedia?.("(display-mode: standalone)")
+    const onChange = () => check()
+    mql?.addEventListener?.("change", onChange)
+    return () => mql?.removeEventListener?.("change", onChange)
+  }, [])
 
   return (
   <Card className="w-full max-w-sm mx-auto px-4 sm:px-0">
@@ -95,15 +113,33 @@ export function WorkTimer() {
             <IconClock className="size-4 text-muted-foreground" />
             {tr.arrivedAt}
           </Label>
-          <Input
-            id="arrival-time"
-            ref={timeRef}
-            type="time"
-            value={arrivalTime}
-            onChange={(e) => setArrivalTime(e.target.value)}
-            onFocus={() => scrollIntoViewSafe(timeRef.current)}
-            className="w-full text-base tabular-nums"
-          />
+          {isStandalone ? (
+            <>
+              <button
+                aria-label="Set arrival time"
+                onClick={() => setTimePickerOpen(true)}
+                className="w-full text-left px-3 py-2 rounded-md border bg-transparent text-base tabular-nums"
+              >
+                {arrivalTime}
+              </button>
+              <TimePicker
+                open={timePickerOpen}
+                value={arrivalTime}
+                onChange={(v) => setArrivalTime(v)}
+                onClose={() => setTimePickerOpen(false)}
+              />
+            </>
+          ) : (
+            <Input
+              id="arrival-time"
+              ref={timeRef}
+              type="time"
+              value={arrivalTime}
+              onChange={(e) => setArrivalTime(e.target.value)}
+              onFocus={() => scrollIntoViewSafe(timeRef.current)}
+              className="w-full text-base tabular-nums"
+            />
+          )}
         </div>
 
         {/* Arrival date input */}
