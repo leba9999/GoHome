@@ -57,7 +57,12 @@ export function WorkTimer() {
         <CardDescription>{tr.appDescription}</CardDescription>
       </CardHeader>
 
-  <CardContent className="flex flex-col gap-6 min-w-0">
+  <CardContent
+        className="flex flex-col gap-6 min-w-0 pb-12 sm:pb-8"
+        // add extra bottom padding to avoid native picker controls ("Set" button) being
+        // obscured on narrow/installed PWAs; include safe-area inset for gesture bars
+        style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 3rem)" }}
+      >
         {/* Arrival time input */}
         <div className="flex flex-col gap-2">
           <Label htmlFor="arrival-time" className="flex items-center gap-1.5">
