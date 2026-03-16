@@ -27,6 +27,23 @@ export function WorkTimer() {
     tr,
   } = useWorkTimer()
 
+  const timeRef = useRef<HTMLInputElement | null>(null)
+  const dateRef = useRef<HTMLInputElement | null>(null)
+
+  function scrollIntoViewSafe(el: HTMLElement | null) {
+    if (!el) return
+    // wait a tick for native picker to open in some UIs, then center the input
+    setTimeout(() => {
+      try {
+        el.scrollIntoView({ behavior: "smooth", block: "center" })
+      } catch {
+        // fallback: window scroll
+        const y = el.getBoundingClientRect().top + window.scrollY - window.innerHeight / 2
+        window.scrollTo({ top: Math.max(0, y), behavior: "smooth" })
+      }
+    }, 350)
+  }
+
   // Fire confetti only on the first transition into done state
   const firedRef = useRef(false)
   const showConfetti = countdown.done && !firedRef.current
@@ -71,9 +88,11 @@ export function WorkTimer() {
           </Label>
           <Input
             id="arrival-time"
+            ref={timeRef}
             type="time"
             value={arrivalTime}
             onChange={(e) => setArrivalTime(e.target.value)}
+            onFocus={() => scrollIntoViewSafe(timeRef.current)}
             className="w-full text-base tabular-nums"
           />
         </div>
@@ -86,9 +105,11 @@ export function WorkTimer() {
           </Label>
           <Input
             id="arrival-date"
+            ref={dateRef}
             type="date"
             value={arrivalDate}
             onChange={(e) => setArrivalDate(e.target.value)}
+            onFocus={() => scrollIntoViewSafe(dateRef.current)}
             className="w-full text-base tabular-nums"
           />
         </div>
